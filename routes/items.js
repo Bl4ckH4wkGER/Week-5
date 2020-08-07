@@ -3,8 +3,18 @@ var jwt = require('jsonwebtoken');
 const router = Router();
 
 const itemsDAO = require('../daos/items');
-const loginDAO = require('../daos/login');
+const userDAO = require('../daos/user');
 
-// Main routes go here
+// Create
+router.post("/", async (req, res, next) => {
+});
+
+// Get all items
+router.get("/", async (req, res, next) => {
+});
+
+// Update an item
+router.put("/:id", async (req, res, next) => {
+});
 
 module.exports = router;
