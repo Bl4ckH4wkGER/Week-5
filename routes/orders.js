@@ -6,8 +6,23 @@ const ordersDAO = require('../daos/orders');
 const userDAO = require('../daos/user');
 
 // isAuthorized middleware
-// const isAuthorized = async (req, res, next) => {};
-
+const isAuthorized = async (req, res, next) => {
+    let authHeader = req.headers.authorization;
+    if (!authHeader) {
+        res.sendStatus(401);
+    } else {
+        const token = authHeader.split(' ')[1];
+        const jwtSecret = process.env.JWT_SECRET;
+        const user = jwt.verify(token, jwtSecret, (err, decodedToken) => {
+            if (err) {
+                res.sendStatus(401);
+            } else {
+                req.user = decodedToken;
+                next()
+            }
+        })
+    }
+};
 // Create an order
 // router.post("/", 
 //     isAuthorized,

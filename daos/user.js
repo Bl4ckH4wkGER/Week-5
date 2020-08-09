@@ -26,7 +26,7 @@ module.exports.getUser = async (email) => {
     } catch (e) {
         throw e;
     }
-}
+};
 
 module.exports.getUserWithoutPassword = async (email) => {
     try {
@@ -38,7 +38,7 @@ module.exports.getUserWithoutPassword = async (email) => {
     } catch (e) {
         throw e;
     }
-}
+};
 
 module.exports.updateUserPassword = async (email, password) => {
     try {
@@ -48,4 +48,4 @@ module.exports.updateUserPassword = async (email, password) => {
     } catch (e) {
         throw e;
     }
-}
+};
