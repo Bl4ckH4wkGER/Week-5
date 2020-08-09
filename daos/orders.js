@@ -1,12 +1,10 @@
 const mongoose = require('mongoose');
-// const bcrypt = require('bcrypt');
 
 const Order = require('../models/order');
-// const User = require('../models/user');
 
 module.exports = {};
 
-// module.exports.create = async() => {};
+// module.exports.create = async(userId, items) => {};
 
 module.exports.getMyOrder = async(userId) => {
     try {
@@ -26,4 +24,35 @@ module.exports.getAllOrders = async() => {
     }
 };
 
-// module.exports.getOrderId = async(orderId) => {};
+module.exports.adminGetOrderId = async(orderId) => {
+    const validId = await mongoose.Types.ObjectId.isValid(orderId);
+    try{
+        if (validId) {
+            // write aggregation that includes match on orderId only
+            const order = await Order.aggregate([
+                { $match: {orderId: orderId}},
+                // rest goes here
+            ]);
+            return order
+        }
+    } catch (e) {
+        throw e;
+    }
+};
+
+module.exports.userGetOrderId = async(userId, orderId) => {
+    const validId = await mongoose.Types.ObjectId.isValid(orderId);
+    try{
+        if (validId) {
+            // write aggregation that includes match on userId and orderId
+            const order = await Order.aggregate([
+                { $match: {userId: userId}},
+                { $match: {orderId: orderId}},
+                // rest goes here
+            ]);
+            return order
+        }
+    } catch (e) {
+        throw e;
+    }
+};
