@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const Order = require('../models/order');
+const item = require('../models/item');
 
 module.exports = {};
 
@@ -35,32 +36,38 @@ module.exports.getAllOrders = async() => {
     }
 };
 
-module.exports.adminGetOrderId = async(orderId) => {
+module.exports.getAssociatedUserIdFromOrderId = async (orderId) => {
     const validId = await mongoose.Types.ObjectId.isValid(orderId);
     try{
         if (validId) {
-            // write aggregation that includes match on orderId only
-            const order = await Order.aggregate([
-                { $match: {orderId: orderId}},
-                // rest goes here
-            ]);
-            return order
+            const order = await Order.findOne({ _id: orderId });
+            return order.userId
         }
     } catch (e) {
         throw e;
     }
 };
 
-module.exports.userGetOrderId = async(userId, orderId) => {
+module.exports.getOrderId = async (orderId) => {
     const validId = await mongoose.Types.ObjectId.isValid(orderId);
     try{
         if (validId) {
-            // write aggregation that includes match on userId and orderId
-            const order = await Order.aggregate([
-                { $match: {userId: userId}},
-                { $match: {orderId: orderId}},
-                // rest goes here
-            ]);
+            // write aggregation that includes match on orderId only
+            const order = await Order.findOne({ _id: orderId });
+            // const order = await Order.aggregate([
+            //     { $match: { _id : orderId } },
+                // { $map {
+                //     input: items,
+                //     as: _id,
+                //     in: { $lookup: {
+                //         from: "items",
+                //         localField: "_id",
+                //         foreignField: "_id",
+                //         as "item":
+                //         }
+                //     }
+                // }}
+            // ]);
             return order
         }
     } catch (e) {

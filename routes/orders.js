@@ -4,6 +4,7 @@ const router = Router();
 
 const ordersDAO = require('../daos/orders');
 const itemsDAO = require('../daos/items');
+const order = require("../models/order");
 
 // isAuthorized middleware
 const isAuthorized = async (req, res, next) => {
@@ -30,12 +31,9 @@ router.post("/",
     async (req, res, next) => {
         const userId = req.user._id;
         const items = req.body;
-        console.log(items);
         const total = await itemsDAO.calcTotal(items);
-        console.log(total);
         if (total) {
             const newOrder = await ordersDAO.create(userId, items, total);
-            console.log(newOrder)
             if (newOrder) {
                 res.json(newOrder);
             } else {
@@ -78,24 +76,21 @@ router.get("/:id",
     async (req, res, next) => {
         const orderId = req.params.id;
         if (req.user.roles.includes('admin') ==  true) {
-            // allow all orderIds, use adminGetOrderId from DAO
-            res.json({});
-            // const adminOrder = await ordersDAO.adminGetOrderId(orderId);
-            // if (adminOrder) {
-            //     res.json(adminOrder)
-            // } else {
-            //     res.sendStatus(404);
-            // }
+            const adminOrder = await ordersDAO.getOrderId(orderId);
+            if (adminOrder) {
+                res.json(adminOrder)
+            } else {
+                res.sendStatus(404);
+            }
         } else {
-            const userId = req.user._id;
-            // limit to ordersIds of that user, use userGetOrderId
-            res.json({});
-            // const userOrder = await ordersDAO.userGetOrderId(userId, orderId);
-            // if (userOrder) {
-            //     res.json(userOrder)
-            // } else {
-            //     res.sendStatus(404);
-            // }
+            const reqUserId = req.user._id;
+            const orderUserId = await ordersDAO.getAssociatedUserIdFromOrderId(orderId);
+            if (reqUserId == orderUserId) {
+                const userOrder = await ordersDAO.getOrderId(orderId);
+                res.json(userOrder)
+            } else {
+                res.sendStatus(404);
+            }
         }
 });
 
