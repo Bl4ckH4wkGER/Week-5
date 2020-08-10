@@ -4,7 +4,18 @@ const Order = require('../models/order');
 
 module.exports = {};
 
-// module.exports.create = async(userId, items) => {};
+module.exports.create = async(userId, items, total) => {
+    try {
+        const newOrder = await Order.create({
+            userId: userId,
+            items: items,
+            total: total
+        });
+        return newOrder
+    } catch (e) {
+        throw e;
+    }
+};
 
 module.exports.getMyOrder = async(userId) => {
     try {

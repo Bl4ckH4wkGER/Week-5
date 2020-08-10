@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const router = Router();
 
 const ordersDAO = require('../daos/orders');
+const itemsDAO = require('../daos/items');
 
 // isAuthorized middleware
 const isAuthorized = async (req, res, next) => {
@@ -28,9 +29,23 @@ router.post("/",
     isAuthorized,
     async (req, res, next) => {
         const userId = req.user._id;
-        // create actual order here
-        res.json({})
-});
+        const items = req.body;
+        console.log(items);
+        const total = await itemsDAO.calcTotal(items);
+        console.log(total);
+        if (total) {
+            const newOrder = await ordersDAO.create(userId, items, total);
+            console.log(newOrder)
+            if (newOrder) {
+                res.json(newOrder);
+            } else {
+                res.sendStatus(404);
+            }
+        } else {
+            res.sendStatus(400);
+        }
+    }
+);
 
 // Get orders
 router.get("/", 

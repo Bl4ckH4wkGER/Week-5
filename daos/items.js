@@ -30,7 +30,7 @@ module.exports.getById = async (itemId) => {
     try {
         const validId = await mongoose.Types.ObjectId.isValid(itemId);
         if (validId) {
-            const item = Item.findOne({ _id: itemId });
+            const item = await Item.findOne({ _id: itemId });
             return item
         }
     } catch (e) {
@@ -42,7 +42,7 @@ module.exports.updateItem = async (itemId, price) => {
     try {
         const validId = await mongoose.Types.ObjectId.isValid(itemId);
         if (validId) {
-            const updatedItem = Item.update({ _id: itemId }, {  price: price });
+            const updatedItem = await Item.update({ _id: itemId }, {  price: price });
             return updatedItem
         }
     } catch (e) {
@@ -50,4 +50,20 @@ module.exports.updateItem = async (itemId, price) => {
     }
 };
 
-
+module.exports.calcTotal = async (items) => {
+    try {
+        let total = 0;
+        for (let i = 0; i < items.length; i++) {
+            const validId = await mongoose.Types.ObjectId.isValid(items[i]);
+            if (validId) {
+                const item = await Item.findOne({ _id: items[i] });
+                total += item.price
+            } else {
+                return undefined;
+            }
+        }
+        return total
+    } catch (e) {
+        throw e;
+    }   
+}
