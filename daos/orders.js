@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const Order = require('../models/order');
-const item = require('../models/item');
 
 module.exports = {};
 
@@ -52,23 +51,26 @@ module.exports.getOrderId = async (orderId) => {
     const validId = await mongoose.Types.ObjectId.isValid(orderId);
     try{
         if (validId) {
-            // write aggregation that includes match on orderId only
-            const order = await Order.findOne({ _id: orderId });
-            // const order = await Order.aggregate([
-            //     { $match: { _id : orderId } },
-                // { $map {
-                //     input: items,
-                //     as: _id,
-                //     in: { $lookup: {
-                //         from: "items",
-                //         localField: "_id",
-                //         foreignField: "_id",
-                //         as "item":
-                //         }
-                //     }
-                // }}
-            // ]);
-            return order
+            let idToSearch = mongoose.Types.ObjectId(orderId)
+            const order = await Order.aggregate([
+                { $match : { _id : idToSearch } },
+                { $lookup: {
+                    from: "items",
+                    localField: "items",
+                    foreignField: "_id",
+                    as: "items"
+                }},
+                { $project: {
+                    "items.price": 1,
+                    "items.title": 1,
+                    total: 1,
+                    userId: 1
+                } },
+                { $project: {
+                    _id: 0
+                }}
+            ]);
+            return order[0]
         }
     } catch (e) {
         throw e;

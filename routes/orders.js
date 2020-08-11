@@ -4,7 +4,6 @@ const router = Router();
 
 const ordersDAO = require('../daos/orders');
 const itemsDAO = require('../daos/items');
-const order = require("../models/order");
 
 // isAuthorized middleware
 const isAuthorized = async (req, res, next) => {
